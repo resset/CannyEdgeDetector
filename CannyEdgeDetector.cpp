@@ -1,4 +1,15 @@
+/**
+ * \file      CannyEdgeDetector.cpp
+ * \brief     Canny algorithm class file.
+ * \details   This file is part of student project. Some parts of code may be
+ *            influenced by various examples found on internet.
+ * \author    resset <silentdemon@gmail.com>
+ * \date      2006-2012
+ * \copyright GNU General Public License, http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ */
+
 #include <math.h>
+
 #include "CannyEdgeDetector.h"
 
 CannyEdgeDetector::CannyEdgeDetector()
@@ -159,12 +170,12 @@ void CannyEdgeDetector::PreProcessImage(float sigma)
 
 void CannyEdgeDetector::PostProcessImage()
 {
-	// Decreasing width and height...
+	// Decreasing width and height.
 	unsigned long i;
 	height -= 2 * mask_halfsize;
 	width -= 2 * mask_halfsize;
 
-	//
+	// Shrinking image.
 	for (x = 0; x < height; x++) {
 		for (y = 0; y < width; y++) {
 			i = (unsigned long) (x * 3 * width + 3 * y);
@@ -183,19 +194,18 @@ void CannyEdgeDetector::Luminance()
 	for (x = 0; x < height; x++) {
 		for (y = 0; y < width; y++) {
 
-			// Aktualna pozycja "piksela" B w tablicy bitmapy (obliczona na podstawie wspó³rzêdnych x, y)
+			// Current "B" pixel position in bitmap table (calculated with x and y values).
 			i = (unsigned long) (x * 3 * width + 3 * y);
 
-			// The order of bytes is BGR
+			// The order of bytes is BGR.
 			blue_value  = *(source_bitmap + i);
 			green_value = *(source_bitmap + i + 1);
 			red_value   = *(source_bitmap + i + 2);
 
-			// Standard equation from RGB to grayscale
+			// Standard equation from RGB to grayscale.
 			gray_value = (uint8_t) (0.299 * red_value + 0.587 * green_value + 0.114 * blue_value);
 
-			// W docelowej bitmapie wszystkie trzy bajty piksela bêd± mia³y tê sam± warto¶æ.
-			// Od teraz a¿ do koñca dzia³ania algorytmu.
+			// Ultimately making picture grayscale.
 			*(source_bitmap + i) =
 				*(source_bitmap + i + 1) =
 				*(source_bitmap + i + 2) = gray_value;
@@ -244,9 +254,7 @@ void CannyEdgeDetector::GaussianBlur(float sigma)
 
 void CannyEdgeDetector::EdgeDetection()
 {
-	/*
-	 * Sobel masks
-	 */
+	// Sobel masks.
 	float Gx[9];
 	Gx[0] = 1.0; Gx[1] = 0.0; Gx[2] = -1.0;
 	Gx[3] = 2.0; Gx[4] = 0.0; Gx[5] = -2.0;
@@ -261,6 +269,7 @@ void CannyEdgeDetector::EdgeDetection()
 	float max = 0.0;
 	float angle = 0.0;
 
+	// Convolution.
 	for (x = 0; x < height; x++) {
 		for (y = 0; y < width; y++) {
 			value_gx = 0.0;
@@ -277,26 +286,26 @@ void CannyEdgeDetector::EdgeDetection()
 
 			edge_magnitude[x * width + y] = sqrt(value_gx * value_gx + value_gy * value_gy) / 4.0;
 
-			// Maximum
+			// Maximum magnitude.
 			max = edge_magnitude[x * width + y] > max ? edge_magnitude[x * width + y] : max;
 
-			// Angle calculation
+			// Angle calculation.
 			if ((value_gx != 0.0) || (value_gy != 0.0)) {
 				angle = atan2(value_gy, value_gx) * 180.0 / PI;
 			} else {
 				angle = 0.0;
 			}
 			if (((angle > -22.5) && (angle <= 22.5)) ||
-				    ((angle > 157.5) && (angle <= -157.5))) {
+			    ((angle > 157.5) && (angle <= -157.5))) {
 				edge_direction[x * width + y] = 0;
 			} else if (((angle > 22.5) && (angle <= 67.5)) ||
-				    ((angle > -157.5) && (angle <= -112.5))) {
+			           ((angle > -157.5) && (angle <= -112.5))) {
 				edge_direction[x * width + y] = 45;
 			} else if (((angle > 67.5) && (angle <= 112.5)) ||
-				    ((angle > -112.5) && (angle <= -67.5))) {
+			           ((angle > -112.5) && (angle <= -67.5))) {
 				edge_direction[x * width + y] = 90;
 			} else if (((angle > 112.5) && (angle <= 157.5)) ||
-				    ((angle > -67.5) && (angle <= -22.5))) {
+			           ((angle > -67.5) && (angle <= -22.5))) {
 				edge_direction[x * width + y] = 135;
 			}
 		}
@@ -424,7 +433,7 @@ void CannyEdgeDetector::NonMaxSuppression()
 		}
 	}
 
-	// Minimalizacja
+	// Suppression
 	for (x = 0; x < height; x++) {
 		for (y = 0; y < width; y++) {
 			if (GetPixelValue(x, y) == 128) {
@@ -461,7 +470,7 @@ void CannyEdgeDetector::HysteresisRecursion(long x, long y, uint8_t lowThreshold
 	for (long x1 = x - 1; x1 <= x + 1; x1++) {
 		for (long y1 = y - 1; y1 <= y + 1; y1++) {
 			if ((x1 < height) & (y1 < width) & (x1 >= 0) & (y1 >= 0)
-				& (x1 != x) & (y1 != y)) {
+			    & (x1 != x) & (y1 != y)) {
 
 				value = GetPixelValue(x1, y1);
 				if (value != 255) {

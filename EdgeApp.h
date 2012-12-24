@@ -1,3 +1,13 @@
+/**
+ * \file      EdgeApp.h
+ * \brief     EdgeApp wxWidgets application header file.
+ * \details   This file is part of student project. Some parts of code may be
+ *            influenced by various examples found on internet.
+ * \author    resset <silentdemon@gmail.com>
+ * \date      2006-2012
+ * \copyright GNU General Public License, http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ */
+
 #ifndef _EDGEAPP_H_
 #define _EDGEAPP_H_
 

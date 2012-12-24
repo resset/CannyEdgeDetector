@@ -1,3 +1,13 @@
+/**
+ * \file      CannyEdgeDetector.h
+ * \brief     Canny algorithm header file.
+ * \details   This file is part of student project. Some parts of code may be
+ *            influenced by various examples found on internet.
+ * \author    resset <silentdemon@gmail.com>
+ * \date      2006-2012
+ * \copyright GNU General Public License, http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ */
+
 #ifndef _CANNYEDGEDETECTOR_H_
 #define _CANNYEDGEDETECTOR_H_
 
@@ -6,8 +16,8 @@ typedef unsigned char uint8_t;
 /**
  * \brief Canny algorithm class.
  *
- * Algorithm operates on 24-bit RGB (BGR) bitmap. It executes each step of Canny
- * algorithm in one method, <em>ProcessImage</em>.
+ * Algorithm executes each step of Canny algorithm in one method,
+ * ProcessImage. It operates on 24-bit RGB (BGR) bitmap.
  */
 class CannyEdgeDetector
 {
@@ -35,37 +45,32 @@ class CannyEdgeDetector
 		 * edges marked with white.
 		 *
 		 * Steps:
-		 * <ul>
-		 * <li>conversion to grayscale,</li>
-		 * <li>Gaussian blurring with <em>sigma</em> parameter,</li>
-		 * <li>calculation of edge magnitude and direction,</li>
-		 * <li>suppression of non maximum pixels,</li>
-		 * <li>hysteresis thresholding between <em>lowThreshold</em> and
-		 * <em>highThreshold</em> values.</li>
-		 * </ul>
+		 * - conversion to grayscale,
+		 * - Gaussian blurring with sigma parameter,
+		 * - calculation of edge magnitude and direction,
+		 * - suppression of non maximum pixels,
+		 * - hysteresis thresholding between `lowThreshold` and `highThreshold`
+		 *   values.
 		 *
 		 * Above steps are performed on image data organised in two-dimensional
-		 * array of bytes which size is calculated as width * height * 3. Almost
-		 * all of them are performed on <em>workspace_bitmap</em> which is
-		 * higher and wider by few pixels than <em>source_bitmap</em>. This is
-		 * because we need to have additional margins in order to make the steps
-		 * that use masks work on every pixel of original image. For instance,
-		 * Sobel mask is 3x3 so we need at least 1 pixel margin on every side.
-		 * But the size of Gauss mask is variable, depending on sigma value.
-		 * This is why the margins are calculated in <em>PreProcessImage</em>.
-		 * Original <em>width</em> and <em>height</em> values used in addressing
-		 * pixels are also enlarged.
+		 * array of bytes which size is calculated as `width` * `height` * 3.
+		 * Almost all of them are performed on `workspace_bitmap` which is
+		 * higher and wider by few pixels than `source_bitmap`. This is because
+		 * we need to have additional margins in order to make the steps that
+		 * use masks work on every pixel of original image. For instance, Sobel
+		 * mask is 3x3 so we need at least 1 pixel margin on every side. But the
+		 * size of Gauss mask is variable, depending on sigma value. This is why
+		 * the margins are calculated in `PreProcessImage()`. Original width and
+		 * height values used in addressing pixels are also enlarged.
 		 *
 		 * In many places there are used x and y variables which are used as
 		 * counters in addressing pixels in following manner:
-		 * <pre>
-		 *    y->
-		 *    012345
-		 * x 0......
-		 * | 1......
-		 * v 2......
-		 *   3......
-		 * </pre>
+		 *        y->
+		 *        012345
+		 *     x 0......
+		 *     | 1......
+		 *     v 2......
+		 *       3......
 		 *
 		 * \param source_bitmap Source image.
 		 * \param width Width of source image.
@@ -75,7 +80,9 @@ class CannyEdgeDetector
 		 * \param highThreshold Upper threshold of hysteresis (from range of 0-255).
 		 * \return Destination image, bitmap containing edges found.
 		 */
-		uint8_t* ProcessImage(uint8_t* source_bitmap, unsigned int width, unsigned int height, float sigma = 1.0f, uint8_t lowThreshold = 30, uint8_t highThreshold = 80);
+		uint8_t* ProcessImage(uint8_t* source_bitmap, unsigned int width,
+		                      unsigned int height, float sigma = 1.0f,
+		                      uint8_t lowThreshold = 30, uint8_t highThreshold = 80);
 
 	private:
 		/**
@@ -119,17 +126,19 @@ class CannyEdgeDetector
 		unsigned int y;
 
 		/**
-		 * \var Width of Gauss transform mask.
+		 * \var Width of Gauss transform mask (kernel).
 		 */
 		unsigned int mask_size;
 
 		/**
-		 * \var Width of the margin (half of the Gauss transform mask size).
+		 * \var Width of the margin (floor of half of the Gauss mask size).
 		 */
 		unsigned int mask_halfsize;
 
 		/**
 		 * \brief Gets value of (x, y) pixel.
+		 *
+		 * Operates only on `workspace_bitmap`.
 		 *
 		 * \param x Pixel x coordinate.
 		 * \param y Pixel y coordinate.
@@ -139,6 +148,8 @@ class CannyEdgeDetector
 
 		/**
 		 * \brief Sets (x, y) pixel to certain value.
+		 *
+		 * Operates only on `workspace_bitmap`.
 		 *
 		 * \param x Pixel x coordinate.
 		 * \param y Pixel y coordinate.
@@ -179,8 +190,8 @@ class CannyEdgeDetector
 		/**
 		 * \brief Calculates magnitude and direction of image gradient.
 		 *
-		 * Method saves results in two arrays, <em>edge_magnitude</em> and
-		 * <em>edge_direction</em>.
+		 * Method saves results in two arrays, edge_magnitude and
+		 * edge_direction.
 		 */
 		void EdgeDetection();
 
