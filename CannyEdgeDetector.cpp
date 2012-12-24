@@ -96,8 +96,6 @@ inline void CannyEdgeDetector::SetPixelValue(unsigned int x, unsigned int y,
 
 void CannyEdgeDetector::PreProcessImage(float sigma)
 {
-	unsigned long i;
-
 	// Finding mask size with given sigma.
 	mask_size = 2 * round(sqrt(-log(0.3) * 2 * sigma * sigma)) + 1;
 	mask_halfsize = mask_size / 2;
@@ -106,7 +104,7 @@ void CannyEdgeDetector::PreProcessImage(float sigma)
 	height += mask_halfsize * 2;
 	width += mask_halfsize * 2;
 	// Working area.
-	workspace_bitmap = new uint8_t[height * 3 * width];
+	workspace_bitmap = new uint8_t[height * width];
 
 	// Edge information arrays.
 	edge_magnitude = new float[width * height];
@@ -122,47 +120,46 @@ void CannyEdgeDetector::PreProcessImage(float sigma)
 	// Copying image data into work area.
 	for (x = 0; x < height; x++) {
 		for (y = 0; y < width; y++) {
-			i = (unsigned long) (x * width + y);
 			// Upper left corner.
 			if (x < mask_halfsize &&  y < mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap);
+				SetPixelValue(x, y, *(source_bitmap));
 			}
 			// Bottom left corner.
 			else if (x >= height - mask_halfsize && y < mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap + (height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize));
+				SetPixelValue(x, y, *(source_bitmap + (height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize)));
 			}
 			// Upper right corner.
 			else if (x < mask_halfsize && y >= width - mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap + 3 * (width - 2 * mask_halfsize - 1));
+				SetPixelValue(x, y, *(source_bitmap + 3 * (width - 2 * mask_halfsize - 1)));
 			}
 			// Bottom right corner.
 			else if (x >= height - mask_halfsize && y >= width - mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap +
-					(height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize) + 3 * (width - 2 * mask_halfsize - 1));
+				SetPixelValue(x, y, *(source_bitmap +
+					(height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize) + 3 * (width - 2 * mask_halfsize - 1)));
 			}
 			// Upper beam.
 			else if (x < mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap + 3 * (y - mask_halfsize));
+				SetPixelValue(x, y, *(source_bitmap + 3 * (y - mask_halfsize)));
 			}
 			// Bottom beam.
 			else if (x >= height -  mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap +
-					(height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize) + 3 * (y - mask_halfsize));
+				SetPixelValue(x, y, *(source_bitmap +
+					(height - 2 * mask_halfsize - 1) * 3 * (width - 2 * mask_halfsize) + 3 * (y - mask_halfsize)));
 			}
 			// Left beam.
 			else if (y < mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap +
-					(x - mask_halfsize) * 3 * (width - 2 * mask_halfsize));
+				SetPixelValue(x, y, *(source_bitmap +
+					(x - mask_halfsize) * 3 * (width - 2 * mask_halfsize)));
 			}
 			// Right beam.
 			else if (y >= width - mask_halfsize) {
-				workspace_bitmap[i] = *(source_bitmap +
-					(x - mask_halfsize) * 3 * (width - 2 * mask_halfsize) + 3 * (width - 2 * mask_halfsize - 1));
+				SetPixelValue(x, y, *(source_bitmap +
+					(x - mask_halfsize) * 3 * (width - 2 * mask_halfsize) + 3 * (width - 2 * mask_halfsize - 1)));
 			}
 			// The rest of the image.
 			else {
-				workspace_bitmap[i] = *(source_bitmap +
-					(x - mask_halfsize) * 3 * (width - 2 * mask_halfsize) + 3 * (y - mask_halfsize));
+				SetPixelValue(x, y, *(source_bitmap +
+				              (x - mask_halfsize) * 3 * (width - 2 * mask_halfsize) + 3 * (y - mask_halfsize)));
 			}
 		}
 	}
