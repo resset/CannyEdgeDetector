@@ -25,7 +25,7 @@ class CannyEdgeDetector
 		/**
 		 * \var Approximation of pi constant.
 		 */
-		static const float PI = 3.14159265f;
+		static constexpr float PI = 3.14159265f;
 
 		/**
 		 * \brief Constructor, initializes some private variables.
